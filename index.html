@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>USDT Asset Management — Demo</title>
+
+<style>
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: Arial, Helvetica, sans-serif;
+  background: #07111d;
+  color: #fff;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+
+.app {
+  width: 100%;
+  max-width: 440px;
+  background: #0d1b2a;
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 24px;
+  padding: 24px;
+  box-shadow: 0 20px 60px rgba(0,0,0,.35);
+}
+
+.demo-badge {
+  display: inline-block;
+  padding: 7px 11px;
+  border-radius: 20px;
+  background: rgba(255,193,7,.12);
+  color: #ffc107;
+  border: 1px solid rgba(255,193,7,.25);
+  font-size: 11px;
+  font-weight: 700;
+  margin-bottom: 18px;
+}
+
+h1 {
+  font-size: 25px;
+  margin-bottom: 8px;
+}
+
+.subtitle {
+  color: #91a4b8;
+  font-size: 14px;
+  line-height: 1.5;
+  margin-bottom: 22px;
+}
+
+.asset-card {
+  background: linear-gradient(135deg, #123528, #0b211b);
+  border: 1px solid rgba(40,200,140,.18);
+  border-radius: 18px;
+  padding: 20px;
+  margin-bottom: 18px;
+}
+
+.asset-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.usdt-logo {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: #26a17b;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: 800;
+  font-size: 23px;
+}
+
+.asset-name {
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.asset-network {
+  color: #91b7a9;
+  font-size: 12px;
+  margin-top: 4px;
+}
+
+.balance {
+  margin-top: 22px;
+  font-size: 30px;
+  font-weight: 800;
+}
+
+.balance span {
+  font-size: 15px;
+  color: #9db3aa;
+  margin-left: 5px;
+}
+
+.status {
+  margin-top: 9px;
+  color: #54d49d;
+  font-size: 13px;
+}
+
+button {
+  width: 100%;
+  border: 0;
+  border-radius: 13px;
+  padding: 15px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: .2s;
+}
+
+button:active {
+  transform: scale(.98);
+}
+
+.approve-btn {
+  background: #26a17b;
+  color: white;
+  margin-bottom: 10px;
+}
+
+.energy-btn {
+  background: #16283a;
+  color: #fff;
+  border: 1px solid #263c50;
+}
+
+button:hover {
+  filter: brightness(1.1);
+}
+
+.notice {
+  margin-top: 18px;
+  padding: 13px;
+  border-radius: 12px;
+  background: rgba(255,255,255,.035);
+  color: #8498aa;
+  font-size: 11px;
+  line-height: 1.5;
+  text-align: center;
+}
+
+/* Modal */
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.72);
+  backdrop-filter: blur(7px);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  z-index: 100;
+}
+
+.overlay.active {
+  display: flex;
+}
+
+.modal {
+  width: 100%;
+  max-width: 410px;
+  background: #0e1c2b;
+  border: 1px solid rgba(255,255,255,.09);
+  border-radius: 22px;
+  padding: 24px;
+  position: relative;
+  animation: popup .22s ease;
+}
+
+@keyframes popup {
+  from {
+    opacity: 0;
+    transform: translateY(15px) scale(.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.close {
+  position: absolute;
+  right: 18px;
+  top: 15px;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: #17283a;
+  color: #fff;
+  padding: 0;
+  font-size: 20px;
+}
+
+.modal h2 {
+  font-size: 21px;
+  margin-bottom: 8px;
+}
+
+.modal-description {
+  color: #8da0b3;
+  font-size: 13px;
+  line-height: 1.5;
+  margin-bottom: 20px;
+}
+
+.energy-box {
+  background: #101f30;
+  border: 1px solid #24384c;
+  border-radius: 15px;
+  padding: 18px;
+  margin-bottom: 16px;
+}
+
+.energy-label {
+  color: #8fa2b5;
+  font-size: 12px;
+  margin-bottom: 7px;
+}
+
+.energy-value {
+  font-size: 25px;
+  font-weight: 800;
+}
+
+.energy-value small {
+  font-size: 14px;
+  color: #9caebe;
+}
+
+.demo-warning {
+  background: rgba(255,193,7,.08);
+  border: 1px solid rgba(255,193,7,.22);
+  color: #e4c66b;
+  border-radius: 12px;
+  padding: 12px;
+  font-size: 11px;
+  line-height: 1.5;
+  margin-bottom: 16px;
+}
+
+/* QR */
+.qr-section {
+  text-align: center;
+}
+
+.qr-wrapper {
+  width: 210px;
+  height: 210px;
+  background: white;
+  border-radius: 15px;
+  padding: 10px;
+  margin: 5px auto 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.qr-wrapper img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.address-label {
+  color: #8fa2b5;
+  font-size: 12px;
+  margin-bottom: 7px;
+}
+
+.address {
+  background: #091521;
+  border: 1px solid #24384c;
+  border-radius: 10px;
+  padding: 12px;
+  font-size: 11px;
+  line-height: 1.5;
+  word-break: break-all;
+  color: #dbe6ef;
+  margin-bottom: 12px;
+}
+
+.copy-btn {
+  background: #172a3d;
+  color: white;
+  margin-bottom: 9px;
+}
+
+.back-btn {
+  background: transparent;
+  color: #8ea1b3;
+  padding: 10px;
+  font-size: 13px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+  <div class="demo-badge">DEMO / TEST INTERFACE</div>
+
+  <h1>USDT Asset Management</h1>
+
+  <p class="subtitle">
+    Manage and review your USDT asset authorization status.
+    This interface is a simulation and does not perform blockchain transactions.
+  </p>
+
+  <div class="asset-card">
+
+    <div class="asset-header">
+      <div class="usdt-logo">₮</div>
+
+      <div>
+        <div class="asset-name">Tether USD</div>
+        <div class="asset-network">USDT Asset • Demo Network</div>
+      </div>
+    </div>
+
+    <div class="balance">
+      250,000.00 <span>USDT</span>
+    </div>
+
+    <div class="status">
+      ● Asset available for management
+    </div>
+
+  </div>
+
+  <button class="approve-btn" onclick="openApproval()">
+    Approve USDT Asset
+  </button>
+
+  <button class="energy-btn" onclick="openEnergy()">
+    Get Energy
+  </button>
+
+  <div class="notice">
+    DEMO ONLY — No wallet connection, blockchain approval,
+    transaction signing, or real payment is performed.
+  </div>
+
+</div>
+
+
+<!-- APPROVAL MODAL -->
+<div class="overlay" id="approvalModal">
+
+  <div class="modal">
+
+    <button class="close" onclick="closeModal('approvalModal')">
+      ×
+    </button>
+
+    <h2>Approve USDT Asset</h2>
+
+    <p class="modal-description">
+      This demo simulates an asset-management approval request.
+    </p>
+
+    <div class="energy-box">
+      <div class="energy-label">Asset</div>
+      <div class="energy-value">
+        USDT <small>• Demo</small>
+      </div>
+    </div>
+
+    <button class="approve-btn" onclick="approveDemo()">
+      Confirm Demo Approval
+    </button>
+
+    <button class="back-btn" onclick="closeModal('approvalModal')">
+      Cancel
+    </button>
+
+  </div>
+
+</div>
+
+
+<!-- ENERGY MODAL -->
+<div class="overlay" id="energyModal">
+
+  <div class="modal">
+
+    <button class="close" onclick="closeModal('energyModal')">
+      ×
+    </button>
+
+    <h2>Get Energy</h2>
+
+    <p class="modal-description">
+      Simulated energy request for the USDT asset-management demo.
+    </p>
+
+    <div class="energy-box">
+
+      <div class="energy-label">
+        Demo top-up amount
+      </div>
+
+      <div class="energy-value">
+        0.00566 <small>ETH</small>
+      </div>
+
+    </div>
+
+    <div class="demo-warning">
+      DEMO ONLY: The amount above is illustrative. Do not send
+      cryptocurrency to an address expecting this page to unlock
+      real USDT transfers or blockchain energy.
+    </div>
+
+    <button class="approve-btn" onclick="showQR()">
+      Get Energy
+    </button>
+
+    <button class="back-btn" onclick="closeModal('energyModal')">
+      Cancel
+    </button>
+
+  </div>
+
+</div>
+
+
+<!-- QR MODAL -->
+<div class="overlay" id="qrModal">
+
+  <div class="modal qr-section">
+
+    <button class="close" onclick="closeModal('qrModal')">
+      ×
+    </button>
+
+    <h2>Demo Address</h2>
+
+    <p class="modal-description">
+      This QR/address display is provided for demonstration only.
+    </p>
+
+    <div class="qr-wrapper">
+      <img
+        id="qrImage"
+        alt="Demo QR Code"
+      >
+    </div>
+
+    <div class="address-label">
+      Displayed wallet address
+    </div>
+
+    <div class="address" id="walletAddress">
+      0x8f45d779b1d21c2556501f776e2cdbbc0f7a86a1
+    </div>
+
+    <button class="copy-btn" onclick="copyAddress()">
+      Copy Address
+    </button>
+
+    <button class="back-btn" onclick="closeModal('qrModal')">
+      Close
+    </button>
+
+  </div>
+
+</div>
+
+
+<script>
+const walletAddress =
+  "0x8f45d779b1d21c2556501f776e2cdbbc0f7a86a1";
+
+function openApproval() {
+  document
+    .getElementById("approvalModal")
+    .classList.add("active");
+}
+
+function openEnergy() {
+  document
+    .getElementById("energyModal")
+    .classList.add("active");
+}
+
+function showQR() {
+
+  const qrData = encodeURIComponent(walletAddress);
+
+  /*
+    The QR is generated for visual/demo purposes only.
+    It does not initiate or verify a blockchain transaction.
+  */
+  const qrURL =
+    "https://api.qrserver.com/v1/create-qr-code/?size=500x500&data="
+    + qrData;
+
+  document.getElementById("qrImage").src = qrURL;
+
+  closeModal("energyModal");
+
+  document
+    .getElementById("qrModal")
+    .classList.add("active");
+}
+
+function closeModal(id) {
+  document
+    .getElementById(id)
+    .classList.remove("active");
+}
+
+function approveDemo() {
+
+  const button = document.querySelector(
+    "#approvalModal .approve-btn"
+  );
+
+  button.textContent = "Demo Approved ✓";
+  button.style.background = "#168c68";
+
+  setTimeout(() => {
+    closeModal("approvalModal");
+
+    button.textContent = "Confirm Demo Approval";
+    button.style.background = "";
+  }, 900);
+}
+
+async function copyAddress() {
+
+  try {
+
+    await navigator.clipboard.writeText(walletAddress);
+
+    const button =
+      document.querySelector(".copy-btn");
+
+    const oldText = button.textContent;
+
+    button.textContent = "Address Copied ✓";
+
+    setTimeout(() => {
+      button.textContent = oldText;
+    }, 1500);
+
+  } catch (error) {
+
+    alert("Address:\n\n" + walletAddress);
+
+  }
+}
+
+
+/* Close modal when clicking outside the dialog */
+document.querySelectorAll(".overlay").forEach(overlay => {
+
+  overlay.addEventListener("click", function(event) {
+
+    if (event.target === overlay) {
+      overlay.classList.remove("active");
+    }
+
+  });
+
+});
+
+
+/* Escape key closes open modal */
+document.addEventListener("keydown", function(event) {
+
+  if (event.key === "Escape") {
+
+    document.querySelectorAll(".overlay").forEach(modal => {
+      modal.classList.remove("active");
+    });
+
+  }
+
+});
+</script>
+
+</body>
+</html>
