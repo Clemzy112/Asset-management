@@ -1,0 +1,1112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta name="theme-color" content="#ffffff">
+<title>Crypto Exchange</title>
+
+<style>
+*{ margin:0; padding:0; box-sizing:border-box; }
+html,body{ width:100%; height:100%; }
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+  background:#eeeeee;
+  color:#111;
+  overflow:hidden;
+}
+button{ font-family:inherit; border:0; background:none; cursor:pointer; }
+
+/* ========================= DEMO LABEL ========================= */
+.demo-label{
+  position:fixed; top:8px; left:50%; transform:translateX(-50%); z-index:99999;
+  background:#f0b90b; color:#111; padding:4px 13px; border-radius:20px;
+  font-size:10px; font-weight:800; letter-spacing:.7px;
+}
+
+/* ========================= PHONE ========================= */
+.phone{
+  position:relative; width:375px; height:812px; margin:20px auto;
+  background:#f7f7f7; border:10px solid #191919; border-radius:40px;
+  overflow:hidden; box-shadow:0 25px 60px rgba(0,0,0,.25);
+  display:flex; flex-direction:column;
+}
+
+/* ========================= STATUS BAR ========================= */
+.status{
+  height:30px; flex-shrink:0; background:#fff;
+  display:flex; align-items:center; justify-content:space-between;
+  padding:3px 15px 0; font-size:12px; font-weight:650;
+}
+.status-right{ display:flex; align-items:center; gap:7px; }
+.signal{ display:flex; gap:2px; align-items:flex-end; }
+.signal span{ width:3px; background:#111; border-radius:2px; }
+.signal span:nth-child(1){ height:4px; }
+.signal span:nth-child(2){ height:6px; }
+.signal span:nth-child(3){ height:8px; }
+.signal span:nth-child(4){ height:10px; }
+
+/* ========================= SCROLLABLE CONTENT ========================= */
+.content{
+  flex:1; min-height:0; overflow-y:auto; overflow-x:hidden;
+  background:#f7f7f7; padding-bottom:0;
+}
+.content::-webkit-scrollbar{ width:0; }
+
+/* ========================= HEADER ========================= */
+.header{
+  height:67px; background:#fff; padding:8px 13px;
+  display:flex; justify-content:space-between; align-items:center;
+}
+.header-side{ display:flex; align-items:center; gap:9px; }
+.menu{ width:29px; }
+.menu span{ display:block; height:3px; background:#111; border-radius:5px; margin:5px 0; }
+.headphones{
+  width:27px; height:27px; position:relative;
+  border:3px solid #111; border-bottom:0; border-radius:16px 16px 0 0;
+}
+.headphones:before,.headphones:after{
+  content:""; position:absolute; top:10px;
+  width:5px; height:10px; background:#111; border-radius:4px;
+}
+.headphones:before{ left:-5px; }
+.headphones:after{ right:-5px; }
+
+/* ========================= EXCHANGE / WALLET ========================= */
+.switch{ background:#f1f1f1; border-radius:14px; padding:4px; display:flex; }
+.switch button{ padding:8px 14px; border-radius:10px; color:#999; font-size:16px; }
+.switch button.selected{
+  background:#fff; color:#111; font-weight:600;
+  box-shadow:0 1px 5px rgba(0,0,0,.05);
+}
+
+/* ========================= HEADER LOGO ========================= */
+.header-logo{ width:28px; height:28px; object-fit:contain; }
+
+/* ========================= NOTIFICATION ========================= */
+.notification{ position:relative; font-size:27px; line-height:1; }
+.notification-number{
+  position:absolute; top:-5px; right:-6px; min-width:18px; height:18px;
+  border-radius:50%; background:#f0b90b; font-size:10px;
+  display:flex; justify-content:center; align-items:center; font-weight:700;
+}
+
+/* ========================= SEARCH ========================= */
+.search{ padding:8px 15px 13px; background:#fff; }
+.search-box{
+  height:45px; border-radius:12px; background:#f5f5f5;
+  display:flex; align-items:center; padding:0 12px; gap:8px;
+}
+.search-glass{ font-size:28px; color:#999; }
+.search-input{
+  flex:1; min-width:0; border:0; outline:0;
+  background:none; font-size:15px; color:#888;
+}
+.scan{ font-size:25px; color:#888; }
+
+/* ========================= BALANCE ========================= */
+.balance{ background:#fff; padding:14px 16px 19px; }
+.balance-top{ display:flex; justify-content:space-between; align-items:center; }
+.balance-title{ font-size:16px; display:flex; align-items:center; gap:5px; }
+.chevron-btn{
+  font-size:16px; line-height:1; background:none; border:0; cursor:pointer;
+  color:#333; padding:0 2px; display:inline-flex; align-items:center;
+  transition:transform 0.25s ease; transform-origin:center center;
+}
+.chevron-btn.open{ transform:rotate(180deg); }
+.add{
+  background:#fcd535; border-radius:7px; padding:12px 17px;
+  font-size:15px; font-weight:700; text-decoration:underline;
+  display:inline-block; color:#111; line-height:1;
+}
+.balance-value{
+  display:flex; align-items:center; gap:7px; margin-top:8px;
+  overflow:hidden; transition:max-height 0.3s ease,opacity 0.3s ease,margin-top 0.3s ease;
+  max-height:60px; opacity:1;
+}
+.balance-value.hidden{ max-height:0; opacity:0; margin-top:0; pointer-events:none; }
+.balance-number{ font-size:27px; font-weight:650; letter-spacing:-.5px; }
+.balance-masked{
+  font-size:27px; font-weight:650; letter-spacing:2px;
+  color:#aaa; margin-top:8px; display:none; user-select:none;
+}
+.balance-masked.visible{ display:block; }
+.balance-unit{ font-size:15px; color:#555; }
+.eye{ color:#777; font-size:19px; }
+
+/* ========================= QUICK ACTIONS ========================= */
+.quick{
+  background:#fff; padding:7px 13px 18px;
+  display:grid; grid-template-columns:repeat(4,1fr); gap:8px;
+}
+.quick-item{ display:flex; flex-direction:column; align-items:center; gap:8px; color:#555; font-size:13px; }
+.quick-box{
+  width:66px; height:66px; border-radius:16px; background:#fff;
+  border:1px solid #f1f1f1; box-shadow:0 2px 10px rgba(0,0,0,.04);
+  display:flex; justify-content:center; align-items:center;
+}
+.quick-svg{ width:35px; height:35px; }
+
+/* ========================= CARDS ========================= */
+.card{ background:#fff; margin:0 14px 12px; border-radius:18px; }
+
+/* ========================= PLAY CARD ========================= */
+.play{ min-height:176px; padding:18px 16px; position:relative; }
+.play-heading{ color:#999; font-size:16px; margin-bottom:18px; }
+.play-content{ display:flex; align-items:center; gap:13px; }
+.play-icon{
+  width:54px; height:54px; border:3px solid #222; border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  font-size:28px; flex-shrink:0;
+}
+.play-title{ font-size:17px; font-weight:700; line-height:1.3; }
+.play-btn{ margin-top:10px; background:#eee; padding:8px 17px; border-radius:7px; font-weight:600; text-decoration:underline; }
+.close{ position:absolute; right:15px; top:16px; font-size:28px; color:#999; }
+
+/* ========================= TWO COLUMNS ========================= */
+.two{ display:grid; grid-template-columns:1fr 1fr; gap:12px; padding:0 14px 12px; }
+.small-card{ background:#fff; min-height:255px; border-radius:18px; padding:17px; position:relative; }
+.small-heading{ color:#999; font-size:16px; margin-bottom:15px; }
+
+/* ========================= COINS ========================= */
+.coin-row{ display:flex; align-items:center; margin-bottom:20px; }
+.coin-logo{ width:32px; height:32px; object-fit:contain; }
+.usd{
+  width:32px; height:32px; margin-left:-6px; border-radius:50%;
+  background:#111; color:#fff; border:2px solid #fff;
+  display:flex; justify-content:center; align-items:center; font-size:17px;
+}
+.buy{ color:#20b985; font-size:14px; margin-bottom:9px; }
+.wallet-name{ font-size:17px; font-weight:600; }
+.wallet{ width:28px; height:20px; border:2px solid #333; border-radius:4px; opacity:.45; margin-top:27px; }
+
+/* ========================= RECURRING ========================= */
+.recurring-top{ display:flex; justify-content:space-between; color:#999; font-size:16px; }
+.arrow{ font-size:25px; }
+.plan{ margin-top:29px; }
+.plan-title{ font-size:15px; font-weight:600; line-height:1.4; }
+.recommend{
+  display:inline-block; margin-top:13px; background:#fff5cf;
+  color:#d5b000; padding:5px 8px; border-radius:5px; font-size:10px; font-weight:600;
+}
+.roi{ margin-top:10px; }
+.roi-value{ color:#e64d63; font-size:20px; font-weight:700; }
+.roi-label{ color:#aaa; font-size:12px; margin-top:3px; }
+.btc{ position:absolute; width:38px; height:38px; object-fit:contain; right:16px; bottom:17px; }
+
+/* ========================= EARN / RECEIVE ========================= */
+.bottom-cards{ display:grid; grid-template-columns:1fr 1fr; gap:12px; padding:0 14px 20px; }
+.info{ background:#fff; border-radius:18px; min-height:170px; padding:17px; }
+.info-head{ display:flex; justify-content:space-between; color:#999; font-size:16px; margin-bottom:23px; }
+.eth-row{ display:flex; align-items:center; gap:11px; }
+.eth{ width:43px; height:43px; object-fit:contain; }
+.coin-name{ font-size:16px; font-weight:600; }
+.apr{ margin-top:4px; color:#999; font-size:13px; }
+.receive{ font-size:15px; font-weight:600; line-height:1.4; }
+
+/* ========================= FIXED BOTTOM NAVIGATION ========================= */
+.bottom-nav{
+  position:absolute; left:0; right:0; bottom:0; height:112px;
+  background:#fff; border-top:1px solid #eeeeee; z-index:5000;
+  box-shadow:0 -2px 10px rgba(0,0,0,.04);
+}
+
+/* ========================= DISCOVER ROW ========================= */
+.feed-tabs{
+  height:43px; display:flex; align-items:center; justify-content:space-between;
+  padding:0 12px; background:#fff;
+}
+.feed-btn{ border:0; background:none; color:#777; font-size:13px; padding:5px 2px; white-space:nowrap; }
+.feed-btn.active{
+  color:#111; font-weight:600; text-decoration:underline;
+  text-decoration-thickness:2px; text-underline-offset:5px;
+}
+.feed-up{ border:0; background:none; color:#888; font-size:21px; }
+
+/* ========================= MAIN BUTTON NAV ========================= */
+.main-nav{
+  height:69px; display:grid; grid-template-columns:repeat(5,1fr);
+  align-items:stretch; padding:3px 3px 5px;
+}
+.main-nav-btn{
+  border:0; background:transparent; display:flex; flex-direction:column;
+  align-items:center; justify-content:center; gap:4px;
+  color:#555; font-size:11px; border-radius:10px;
+}
+.main-nav-btn.active{ background:#e8e8e8; color:#111; font-weight:600; }
+.main-nav-btn svg{
+  width:27px; height:27px; fill:none; stroke:#555;
+  stroke-width:2; stroke-linecap:round; stroke-linejoin:round;
+}
+.main-nav-btn.active svg{ stroke:#111; }
+.main-nav-btn label{ font-size:11px; line-height:12px; }
+
+/* ========================= HOME DIAMOND ICON ========================= */
+.home-symbol{ width:27px; height:27px; position:relative; }
+.home-symbol span,.home-symbol b{
+  position:absolute; width:8px; height:8px;
+  background:#111; transform:rotate(45deg); display:block;
+}
+.home-symbol span:nth-child(1){ left:9px; top:1px; }
+.home-symbol span:nth-child(2){ left:1px; top:9px; }
+.home-symbol span:nth-child(3){ right:1px; top:9px; }
+.home-symbol span:nth-child(4){ left:9px; bottom:1px; }
+.home-symbol b{ width:7px; height:7px; left:10px; top:10px; }
+
+/* ========================= TRADINGVIEW SECTION ========================= */
+.tv-section{ background:#fff; margin:0 0 12px; padding:14px 14px 10px; }
+.tv-section-title{
+  font-size:15px; font-weight:700; margin-bottom:10px;
+  display:flex; justify-content:space-between; align-items:center;
+}
+.tv-section-title a{ font-size:12px; font-weight:500; color:#f0b90b; text-decoration:none; }
+.tv-wrapper{ border-radius:12px; overflow:hidden; height:200px; }
+
+/* ========================= GAINERS / LOSERS SECTION ========================= */
+.gl-section{ background:#fff; margin:0 0 12px; padding:14px; }
+.gl-tabs{ display:flex; gap:6px; margin-bottom:12px; }
+.gl-tab{
+  padding:6px 14px; border-radius:20px; font-size:13px; font-weight:600;
+  background:#f1f1f1; color:#777; cursor:pointer; border:0; font-family:inherit;
+}
+.gl-tab.active{ background:#111; color:#fff; }
+.gl-list{ display:flex; flex-direction:column; gap:10px; }
+.gl-row{ display:flex; align-items:center; gap:10px; }
+.gl-icon{ width:34px; height:34px; border-radius:50%; object-fit:contain; flex-shrink:0; background:#f5f5f5; }
+.gl-icon-placeholder{
+  width:34px; height:34px; border-radius:50%; background:#f0b90b22;
+  display:flex; align-items:center; justify-content:center;
+  font-size:13px; font-weight:700; color:#f0b90b; flex-shrink:0;
+}
+.gl-info{ flex:1; min-width:0; }
+.gl-name{ font-size:14px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.gl-price{ font-size:12px; color:#888; margin-top:1px; }
+.gl-change{ font-size:14px; font-weight:700; flex-shrink:0; }
+.gl-change.up{ color:#16c784; }
+.gl-change.down{ color:#ea3943; }
+.gl-loading{ text-align:center; padding:20px 0; color:#aaa; font-size:13px; }
+.gl-error{ text-align:center; padding:14px 0; color:#e64d63; font-size:12px; }
+
+/* ========================= ENERGY SECTION ========================= */
+.energy-section{
+  background:#fff; margin:0 0 12px; padding:16px 14px;
+  border-top:1px solid #f0f0f0;
+}
+.energy-title{
+  font-size:15px; font-weight:700; margin-bottom:13px;
+  display:flex; align-items:center; gap:6px;
+}
+.energy-title span{ font-size:18px; }
+.energy-row{ display:flex; align-items:center; gap:10px; margin-bottom:12px; }
+.energy-info{ flex:1; }
+.energy-info-title{ font-size:14px; font-weight:600; }
+.energy-info-sub{ font-size:12px; color:#888; margin-top:2px; }
+.energy-amount{
+  background:#fff8e1; border:1px solid #f0b90b33;
+  border-radius:10px; padding:10px 14px; margin-bottom:14px;
+}
+.energy-amount-label{ font-size:11px; color:#888; margin-bottom:3px; }
+.energy-amount-val{ font-size:20px; font-weight:700; color:#f0b90b; }
+
+/* Approve USDT button */
+.btn-approve{
+  width:100%; padding:13px; border-radius:12px;
+  background:#f0b90b; color:#111; font-size:15px; font-weight:700;
+  display:flex; align-items:center; justify-content:center; gap:8px;
+  transition:opacity .2s; margin-bottom:9px;
+}
+.btn-approve:active{ opacity:.8; }
+.btn-approve.loading{ opacity:.7; pointer-events:none; }
+.btn-approve.success{ background:#16c784; color:#fff; }
+
+/* Get Energy button */
+.btn-energy{
+  width:100%; padding:13px; border-radius:12px;
+  background:#111; color:#fff; font-size:15px; font-weight:700;
+  display:flex; align-items:center; justify-content:center; gap:8px;
+  transition:opacity .2s;
+}
+.btn-energy:active{ opacity:.8; }
+.btn-energy.disabled{ opacity:.4; pointer-events:none; }
+
+/* ========================= SPINNER ========================= */
+.spinner{
+  width:18px; height:18px; border:2px solid rgba(255,255,255,.3);
+  border-top-color:#fff; border-radius:50%;
+  animation:spin .7s linear infinite; display:inline-block; flex-shrink:0;
+}
+.spinner.dark{
+  border-color:rgba(0,0,0,.2); border-top-color:#111;
+}
+@keyframes spin{ to{ transform:rotate(360deg); } }
+
+/* ========================= MODAL OVERLAY ========================= */
+.modal-overlay{
+  position:absolute; inset:0; z-index:9000;
+  background:rgba(0,0,0,.55); backdrop-filter:blur(2px);
+  display:flex; align-items:flex-end; justify-content:center;
+  opacity:0; pointer-events:none; transition:opacity .25s;
+}
+.modal-overlay.open{ opacity:1; pointer-events:all; }
+
+/* ========================= BOTTOM SHEET ========================= */
+.modal-sheet{
+  width:100%; background:#fff; border-radius:22px 22px 0 0;
+  padding:20px 18px 32px; transform:translateY(100%);
+  transition:transform .35s cubic-bezier(.32,1,.6,1);
+  max-height:85vh; overflow-y:auto;
+}
+.modal-overlay.open .modal-sheet{ transform:translateY(0); }
+.modal-handle{
+  width:36px; height:4px; border-radius:4px; background:#ddd;
+  margin:0 auto 18px;
+}
+.modal-title{ font-size:17px; font-weight:700; margin-bottom:4px; }
+.modal-sub{ font-size:13px; color:#888; margin-bottom:18px; }
+
+/* Wallet Address Box */
+.wallet-addr-box{
+  background:#f7f7f7; border-radius:12px; padding:13px 14px;
+  margin-bottom:14px; display:flex; align-items:center; gap:10px;
+}
+.wallet-addr-text{
+  flex:1; font-size:12px; color:#333; word-break:break-all;
+  line-height:1.5; font-family:monospace;
+}
+.copy-btn{
+  background:#f0b90b; border-radius:8px; padding:7px 12px;
+  font-size:12px; font-weight:700; color:#111; flex-shrink:0;
+  display:flex; align-items:center; gap:4px;
+}
+
+/* QR Code */
+.qr-wrap{
+  display:flex; flex-direction:column; align-items:center;
+  background:#f7f7f7; border-radius:14px; padding:16px;
+  margin-bottom:16px;
+}
+.qr-label{ font-size:12px; color:#888; margin-bottom:10px; }
+.qr-canvas{ border-radius:8px; }
+
+/* Stake energy button (inside modal) */
+.btn-stake{
+  width:100%; padding:14px; border-radius:12px;
+  background:#f0b90b; color:#111; font-size:15px; font-weight:700;
+  display:flex; align-items:center; justify-content:center; gap:8px;
+  margin-bottom:10px;
+}
+.btn-stake:active{ opacity:.85; }
+
+/* Network badge */
+.network-badge{
+  display:inline-flex; align-items:center; gap:5px;
+  background:#fff3cd; border-radius:8px; padding:7px 11px;
+  font-size:12px; font-weight:600; color:#b07d00; margin-bottom:14px;
+}
+
+/* ========================= SUCCESS SCREEN (inside modal) ========================= */
+.success-screen{ text-align:center; padding:10px 0 6px; }
+.success-icon{
+  width:64px; height:64px; border-radius:50%; background:#16c784;
+  display:flex; align-items:center; justify-content:center;
+  font-size:30px; margin:0 auto 14px; color:#fff;
+}
+.success-icon.energy-icon{ background:#f0b90b; font-size:26px; }
+.success-title{ font-size:19px; font-weight:700; margin-bottom:6px; }
+.success-msg{ font-size:13px; color:#888; line-height:1.5; }
+.success-detail{
+  background:#f7f7f7; border-radius:12px; padding:13px 16px;
+  margin:16px 0; text-align:left;
+}
+.success-row{ display:flex; justify-content:space-between; padding:5px 0; font-size:13px; }
+.success-row span:first-child{ color:#888; }
+.success-row span:last-child{ font-weight:600; }
+.btn-done{
+  width:100%; padding:14px; border-radius:12px; background:#111;
+  color:#fff; font-size:15px; font-weight:700; margin-top:4px;
+}
+
+/* Loading overlay inside modal */
+.modal-loading{
+  display:flex; flex-direction:column; align-items:center;
+  justify-content:center; padding:30px 0;
+}
+.modal-loading-spinner{
+  width:44px; height:44px; border:3px solid #f0f0f0;
+  border-top-color:#f0b90b; border-radius:50%;
+  animation:spin .8s linear infinite; margin-bottom:14px;
+}
+.modal-loading-text{ font-size:14px; color:#888; font-weight:500; }
+
+/* ========================= MOBILE ========================= */
+@media(max-width:500px){
+  body{ background:#fff; }
+  .demo-label{ display:none; }
+  .phone{
+    width:100%; height:100vh; margin:0;
+    border:0; border-radius:0; box-shadow:none;
+  }
+}
+@media(max-width:350px){
+  .switch button{ padding:7px 9px; font-size:14px; }
+  .feed-tabs{ padding:0 7px; }
+  .feed-btn{ font-size:11px; }
+  .balance-number{ font-size:23px; }
+  .quick-box{ width:55px; height:55px; }
+  .quick-item{ font-size:11px; }
+}
+</style>
+</head>
+
+<body>
+
+<div class="demo-label"></div>
+
+<div class="phone">
+
+  <!-- STATUS BAR -->
+  <div class="status">
+    <span id="clock"></span>
+    <div class="status-right">
+      <div class="signal">
+        <span></span><span></span><span></span><span></span>
+      </div>
+      <span></span><span></span>
+    </div>
+  </div>
+
+  <!-- SCROLLABLE CONTENT -->
+  <div class="content">
+
+    <!-- HEADER -->
+    <div class="header">
+      <div class="header-side">
+        <button aria-label="Menu" onclick="demoAction('Menu')">
+          <div class="menu"><span></span><span></span><span></span></div>
+        </button>
+        <button aria-label="Support" onclick="demoAction('Support')">
+          <div class="headphones"></div>
+        </button>
+      </div>
+
+      <div class="switch">
+        <button class="selected" onclick="switchMode(this)">Exchange</button>
+        <button onclick="switchMode(this)">Wallet</button>
+      </div>
+
+      <div class="header-side">
+        <button onclick="demoAction('Brand')" aria-label="Brand">
+          <img class="header-logo"
+            src="https://bin.bnbstatic.com/static/images/common/logo.png"
+            alt="Exchange logo" onerror="this.style.display='none';">
+        </button>
+        <button class="notification" onclick="demoAction('Notifications')">
+          ☷<span class="notification-number">7</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- SEARCH -->
+    <div class="search">
+      <div class="search-box">
+        <span class="search-glass">⌕</span>
+        <span>🔥</span>
+        <input class="search-input" value="TRUMP top gainer" readonly>
+        <span class="scan">⌗</span>
+      </div>
+    </div>
+
+    <!-- BALANCE -->
+    <div class="balance">
+      <div class="balance-top">
+        <div class="balance-title">
+          Est. Total Value (USDT)
+          <button class="chevron-btn open" id="balanceToggle"
+            aria-label="Toggle balance visibility" onclick="toggleBalance()">⌄</button>
+        </div>
+        <button class="add"
+          onclick="window.open('https://app-deposit-crypto-io.vercel.app','_blank')">
+          Add Funds
+        </button>
+      </div>
+      <div class="balance-value" id="balanceValue">
+        <span class="balance-number">250,000.00</span>
+        <span class="balance-unit">USDT</span>
+        <span class="eye">◉</span>
+      </div>
+      <div class="balance-masked" id="balanceMasked">••••••••</div>
+    </div>
+
+    <!-- QUICK ACTIONS -->
+    <div class="quick">
+      <button class="quick-item" onclick="demoAction('Earn')">
+        <div class="quick-box">
+          <svg class="quick-svg" viewBox="0 0 40 40" fill="none" stroke="#222" stroke-width="1.8">
+            <path d="M10 15h20v18H10z"/>
+            <path d="M14 15c0-5 2-8 6-8s6 3 6 8"/>
+            <circle cx="20" cy="22" r="3" fill="#f0b90b" stroke="none"/>
+          </svg>
+        </div>
+        <span>Earn</span>
+      </button>
+
+      <button class="quick-item" onclick="demoAction('Alpha Events')">
+        <div class="quick-box">
+          <svg class="quick-svg" viewBox="0 0 40 40" fill="none" stroke="#222" stroke-width="1.8">
+            <rect x="7" y="9" width="26" height="25" rx="2"/>
+            <path d="M7 16h26"/><path d="M13 5v8"/><path d="M27 5v8"/>
+            <text x="16" y="29" font-size="12" fill="#f0b90b" stroke="none">a</text>
+          </svg>
+        </div>
+        <span>Alpha Events</span>
+      </button>
+
+      <button class="quick-item" onclick="demoAction('Rewards Hub')">
+        <div class="quick-box">
+          <svg class="quick-svg" viewBox="0 0 40 40" fill="none" stroke="#222" stroke-width="1.8">
+            <path d="M5 14h30v16H5z"/>
+            <text x="16" y="26" font-size="11" fill="#f0b90b" stroke="none">★</text>
+          </svg>
+        </div>
+        <span>Rewards Hub</span>
+      </button>
+
+      <button class="quick-item" onclick="demoAction('More')">
+        <div class="quick-box">
+          <svg class="quick-svg" viewBox="0 0 40 40" fill="none" stroke="#222" stroke-width="1.8">
+            <rect x="6" y="6" width="10" height="10"/>
+            <rect x="24" y="6" width="10" height="10"/>
+            <rect x="6" y="24" width="10" height="10"/>
+            <circle cx="29" cy="29" r="5" fill="#f0b90b" stroke="none"/>
+          </svg>
+        </div>
+        <span>More</span>
+      </button>
+    </div>
+
+    <!-- PLAY & PREDICT -->
+    <div class="card play" id="playCard">
+      <button class="close" onclick="closePlay()">×</button>
+      <div class="play-heading">Play &amp; Predict</div>
+      <div class="play-content">
+        <div class="play-icon">♠</div>
+        <div>
+          <div class="play-title">$3,000,000–Play igaming,<br>Predict Sports</div>
+          <button class="play-btn" onclick="demoAction('Play')">Play!</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- TWO COLUMNS -->
+    <div class="two">
+      <div class="small-card">
+        <div class="small-heading">USDT / USD</div>
+        <div class="coin-row">
+          <img class="coin-logo" src="https://assets.coingecko.com/coins/images/325/small/Tether.png" alt="USDT">
+          <div class="usd">$</div>
+        </div>
+        <div class="buy">Buy</div>
+        <div class="wallet-name">Fiat wallet</div>
+        <div class="wallet"></div>
+      </div>
+
+      <div class="small-card recurring">
+        <div class="recurring-top">
+          <span>Recurring Plan</span>
+          <span class="arrow">›</span>
+        </div>
+        <div class="plan">
+          <div class="plan-title">Create Your First BTC<br>Recurring Plan</div>
+          <span class="recommend">Recommend</span>
+          <div class="roi">
+            <div class="roi-value">-8.54%</div>
+            <div class="roi-label">1Y ROI</div>
+          </div>
+        </div>
+        <img class="btc" src="https://assets.coingecko.com/coins/images/1/small/bitcoin.png" alt="Bitcoin">
+      </div>
+    </div>
+
+    <!-- EARN / RECEIVE -->
+    <div class="bottom-cards">
+      <div class="info">
+        <div class="info-head"><span>Earn</span><span>›</span></div>
+        <div class="eth-row">
+          <img class="eth" src="https://assets.coingecko.com/coins/images/279/small/ethereum.png" alt="Ethereum">
+          <div>
+            <div class="coin-name">ETH</div>
+            <div class="apr">APR: 1.9%</div>
+          </div>
+        </div>
+      </div>
+      <div class="info">
+        <div class="info-head"><span>Receive</span><span>›</span></div>
+        <div class="receive">Receive Funds from<br>Exchange User</div>
+      </div>
+    </div>
+
+    <!-- ========================= ENERGY SECTION ========================= -->
+    <div class="energy-section">
+      <div class="energy-title"><span>⚡</span> TRX Energy</div>
+
+      <div class="energy-amount">
+        <div class="energy-amount-label">Energy Required</div>
+        <div class="energy-amount-val">65,000 Energy</div>
+      </div>
+
+      <div class="energy-row">
+        <div style="width:36px;height:36px;border-radius:10px;background:#fff8e1;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;">🔋</div>
+        <div class="energy-info">
+          <div class="energy-info-title">Approve USDT Transfer</div>
+          <div class="energy-info-sub">Required to activate smart contract</div>
+        </div>
+      </div>
+
+      <!-- APPROVE USDT BUTTON -->
+      <button class="btn-approve" id="btnApprove" onclick="handleApprove()">
+        <span id="approveText">Approve USDT</span>
+      </button>
+
+      <!-- GET ENERGY BUTTON -->
+      <button class="btn-energy disabled" id="btnEnergy" onclick="handleGetEnergy()">
+        ⚡ Get Energy
+      </button>
+    </div>
+
+    <!-- TRADINGVIEW CHART -->
+    <div class="tv-section">
+      <div class="tv-section-title">
+        <span>📈 Live Chart</span>
+        <a href="https://www.tradingview.com/chart/" target="_blank" rel="noopener noreferrer">Open TradingView ›</a>
+      </div>
+      <div class="tv-wrapper">
+        <div class="tradingview-widget-container" style="height:200px;">
+          <iframe scrolling="no" allowtransparency="true" frameborder="0"
+            src="https://www.tradingview.com/widgetembed/?frameElementId=tradingview_embed&symbol=BINANCE%3ABTCUSDT&interval=D&hidesidetoolbar=1&symboledit=1&saveimage=0&toolbarbg=f1f3f6&studies=[]&theme=light&style=1&timezone=Etc%2FUTC&withdateranges=1&showpopupbutton=0&locale=en&utm_source=demo&utm_medium=widget"
+            style="width:100%;height:200px;border-radius:12px;"></iframe>
+        </div>
+      </div>
+    </div>
+
+    <!-- TOP GAINERS / LOSERS -->
+    <div class="gl-section">
+      <div class="tv-section-title"><span>🔥 Market Movers</span></div>
+      <div class="gl-tabs">
+        <button class="gl-tab active" onclick="switchGL(this,'gainers')">Top Gainers</button>
+        <button class="gl-tab" onclick="switchGL(this,'losers')">Top Losers</button>
+      </div>
+      <div class="gl-list" id="glList">
+        <div class="gl-loading">Loading market data…</div>
+      </div>
+    </div>
+
+    <div style="height:130px;"></div>
+  </div>
+
+  <!-- ========================= BOTTOM NAV ========================= -->
+  <div class="bottom-nav">
+    <div class="feed-tabs">
+      <button class="feed-btn active" onclick="selectFeed(this)">Discover</button>
+      <button class="feed-btn" onclick="selectFeed(this)">Following</button>
+      <button class="feed-btn" onclick="selectFeed(this)">Announcement</button>
+      <button class="feed-btn" onclick="selectFeed(this)">Live</button>
+      <button class="feed-up" onclick="demoAction('Expand')">⌃</button>
+    </div>
+    <div class="main-nav">
+      <button class="main-nav-btn active" onclick="selectNav(this,'Home')">
+        <div class="home-symbol"><span></span><span></span><span></span><span></span><b></b></div>
+        <label>Home</label>
+      </button>
+      <button class="main-nav-btn" onclick="selectNav(this,'Markets')">
+        <svg viewBox="0 0 32 32"><path d="M5 25h22"/><path d="M6 21l7-7 5 4 8-10"/><path d="M21 8h5v5"/></svg>
+        <label>Markets</label>
+      </button>
+      <button class="main-nav-btn" onclick="selectNav(this,'Trade')">
+        <svg viewBox="0 0 32 32"><path d="M7 10h17"/><path d="M20 6l4 4-4 4"/><path d="M25 22H8"/><path d="M12 18l-4 4 4 4"/></svg>
+        <label>Trade</label>
+      </button>
+      <button class="main-nav-btn" onclick="selectNav(this,'Futures')">
+        <svg viewBox="0 0 32 32"><rect x="7" y="4" width="18" height="24" rx="1"/><path d="M11 10h10"/><path d="M11 15h10"/><path d="M11 20h7"/><path d="M20 23l3 3"/></svg>
+        <label>Futures</label>
+      </button>
+      <button class="main-nav-btn" onclick="selectNav(this,'Assets')">
+        <svg viewBox="0 0 32 32"><path d="M5 9h22v18H5z"/><path d="M8 9V6h16v3"/><path d="M18 15h9v6h-9z"/><circle cx="21" cy="18" r="1.2"/></svg>
+        <label>Assets</label>
+      </button>
+    </div>
+  </div>
+
+  <!-- ========================= GET ENERGY MODAL ========================= -->
+  <div class="modal-overlay" id="energyModal" onclick="closeModalOnBg(event)">
+    <div class="modal-sheet">
+      <div class="modal-handle"></div>
+
+      <!-- STEP 1: WALLET INFO -->
+      <div id="modalStepWallet">
+        <div class="modal-title">⚡ Get TRX Energy</div>
+        <div class="modal-sub">Send TRX to this address to receive energy for your USDT transfer</div>
+
+        <div class="network-badge">
+          🟣 TRON Network (TRC20)
+        </div>
+
+        <!-- QR Code -->
+        <div class="qr-wrap">
+          <div class="qr-label">Scan to send TRX</div>
+          <canvas id="qrCanvas" class="qr-canvas" width="160" height="160"></canvas>
+        </div>
+
+        <!-- Wallet Address -->
+        <div class="wallet-addr-box">
+          <div class="wallet-addr-text" id="walletAddrText">TRX9xK2mPqLNvDaZRoYkCxG7fJwB3eHsU4</div>
+          <button class="copy-btn" onclick="copyAddress()">
+            <span id="copyIcon">📋</span> <span id="copyLabel">Copy</span>
+          </button>
+        </div>
+
+        <!-- Amount info -->
+        <div class="success-detail" style="margin-top:0;margin-bottom:14px;">
+          <div class="success-row">
+            <span>Energy needed</span><span>65,000 TRX Energy</span>
+          </div>
+          <div class="success-row">
+            <span>Min. stake amount</span><span>10 TRX</span>
+          </div>
+          <div class="success-row">
+            <span>Estimated time</span><span>~2 minutes</span>
+          </div>
+        </div>
+
+        <!-- Stake Energy Button -->
+        <button class="btn-stake" onclick="handleStakeEnergy()">
+          ⚡ Stake Energy
+        </button>
+        <button style="width:100%;padding:12px;border-radius:12px;background:#f5f5f5;font-size:14px;font-weight:600;color:#555;"
+          onclick="closeModal()">Cancel</button>
+      </div>
+
+      <!-- STEP 2: STAKING LOADING -->
+      <div id="modalStepLoading" style="display:none;">
+        <div class="modal-handle" style="margin-top:-10px;"></div>
+        <div class="modal-loading">
+          <div class="modal-loading-spinner"></div>
+          <div class="modal-loading-text" id="loadingText">Processing stake request…</div>
+          <div style="font-size:12px;color:#bbb;margin-top:6px;">Please wait, do not close</div>
+        </div>
+      </div>
+
+      <!-- STEP 3: SUCCESS -->
+      <div id="modalStepSuccess" style="display:none;">
+        <div class="modal-handle" style="margin-top:-10px;"></div>
+        <div class="success-screen">
+          <div class="success-icon energy-icon">⚡</div>
+          <div class="success-title">Energy Staked!</div>
+          <div class="success-msg">65,000 TRX Energy has been successfully<br>allocated to your wallet.</div>
+          <div class="success-detail">
+            <div class="success-row"><span>Status</span><span style="color:#16c784;">✓ Confirmed</span></div>
+            <div class="success-row"><span>Energy added</span><span>65,000 Energy</span></div>
+            <div class="success-row"><span>Network</span><span>TRON (TRC20)</span></div>
+            <div class="success-row"><span>Tx Hash</span><span style="font-size:11px;font-family:monospace;">0xA3f...9c21</span></div>
+          </div>
+          <button class="btn-done" onclick="closeModal()">Done</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div><!-- end .phone -->
+
+
+<script>
+
+/* ==========================================
+   CLOCK
+========================================== */
+function updateClock(){
+  const now = new Date();
+  let h = now.getHours(), m = String(now.getMinutes()).padStart(2,"0");
+  document.getElementById("clock").textContent = h + ":" + m;
+}
+updateClock();
+setInterval(updateClock, 30000);
+
+/* ==========================================
+   BALANCE TOGGLE
+========================================== */
+let balanceVisible = true;
+function toggleBalance(){
+  const v = document.getElementById("balanceValue");
+  const m = document.getElementById("balanceMasked");
+  const t = document.getElementById("balanceToggle");
+  balanceVisible = !balanceVisible;
+  if(balanceVisible){
+    v.classList.remove("hidden"); m.classList.remove("visible"); t.classList.add("open");
+  } else {
+    v.classList.add("hidden"); m.classList.add("visible"); t.classList.remove("open");
+  }
+}
+
+/* ==========================================
+   SWITCH MODE
+========================================== */
+function switchMode(button){
+  document.querySelectorAll(".switch button").forEach(b => b.classList.remove("selected"));
+  button.classList.add("selected");
+}
+
+/* ==========================================
+   FEED TABS
+========================================== */
+function selectFeed(button){
+  document.querySelectorAll(".feed-btn").forEach(b => b.classList.remove("active"));
+  button.classList.add("active");
+}
+
+/* ==========================================
+   MAIN NAV
+========================================== */
+function selectNav(button, name){
+  document.querySelectorAll(".main-nav-btn").forEach(b => b.classList.remove("active"));
+  button.classList.add("active");
+}
+
+/* ==========================================
+   CLOSE PLAY CARD
+========================================== */
+function closePlay(){
+  document.querySelector(".play").style.display = "none";
+}
+
+/* ==========================================
+   DEMO ACTION
+========================================== */
+function demoAction(name){ console.log("Demo action:", name); }
+
+/* ==========================================
+   APPROVE USDT FLOW
+========================================== */
+let approveState = "idle"; // idle | loading | done
+
+function handleApprove(){
+  if(approveState !== "idle") return;
+  approveState = "loading";
+
+  const btn = document.getElementById("btnApprove");
+  const txt = document.getElementById("approveText");
+
+  btn.classList.add("loading");
+  txt.innerHTML = '<span class="spinner dark"></span> Approving…';
+
+  setTimeout(() => {
+    approveState = "done";
+    btn.classList.remove("loading");
+    btn.classList.add("success");
+    txt.innerHTML = '✓ Approved Successfully';
+    btn.style.pointerEvents = "none";
+
+    // Enable Get Energy button
+    document.getElementById("btnEnergy").classList.remove("disabled");
+  }, 2800);
+}
+
+/* ==========================================
+   GET ENERGY — OPEN MODAL
+========================================== */
+function handleGetEnergy(){
+  if(approveState !== "done") return;
+  showModalStep("wallet");
+  document.getElementById("energyModal").classList.add("open");
+  drawQR();
+}
+
+function closeModal(){
+  document.getElementById("energyModal").classList.remove("open");
+  setTimeout(() => {
+    showModalStep("wallet");
+  }, 400);
+}
+
+function closeModalOnBg(e){
+  if(e.target === document.getElementById("energyModal")) closeModal();
+}
+
+function showModalStep(step){
+  document.getElementById("modalStepWallet").style.display  = (step === "wallet")  ? "" : "none";
+  document.getElementById("modalStepLoading").style.display = (step === "loading") ? "" : "none";
+  document.getElementById("modalStepSuccess").style.display = (step === "success") ? "" : "none";
+}
+
+/* ==========================================
+   STAKE ENERGY FLOW
+========================================== */
+const loadingMessages = [
+  "Processing stake request…",
+  "Connecting to TRON network…",
+  "Confirming transaction…",
+  "Allocating energy to wallet…"
+];
+
+function handleStakeEnergy(){
+  showModalStep("loading");
+  let msgIndex = 0;
+  const ltxt = document.getElementById("loadingText");
+  ltxt.textContent = loadingMessages[0];
+
+  const interval = setInterval(() => {
+    msgIndex++;
+    if(msgIndex < loadingMessages.length){
+      ltxt.textContent = loadingMessages[msgIndex];
+    }
+  }, 900);
+
+  setTimeout(() => {
+    clearInterval(interval);
+    showModalStep("success");
+  }, 4000);
+}
+
+/* ==========================================
+   COPY ADDRESS
+========================================== */
+function copyAddress(){
+  const addr = document.getElementById("walletAddrText").textContent;
+  if(navigator.clipboard){
+    navigator.clipboard.writeText(addr).catch(()=>{});
+  }
+  const label = document.getElementById("copyLabel");
+  const icon  = document.getElementById("copyIcon");
+  label.textContent = "Copied!";
+  icon.textContent  = "✓";
+  setTimeout(()=>{ label.textContent="Copy"; icon.textContent="📋"; }, 2000);
+}
+
+/* ==========================================
+   QR CODE GENERATOR (pure canvas, no library)
+========================================== */
+function drawQR(){
+  const canvas = document.getElementById("qrCanvas");
+  const ctx    = canvas.getContext("2d");
+  const size   = 160;
+  const cell   = 5;
+  const cols   = Math.floor(size / cell);
+
+  // Deterministic pseudo-random pattern seeded on wallet address chars
+  const addr = "TRX9xK2mPqLNvDaZRoYkCxG7fJwB3eHsU4";
+  let seed = 0;
+  for(let i=0;i<addr.length;i++) seed = (seed * 31 + addr.charCodeAt(i)) >>> 0;
+
+  function rng(){ seed = (seed * 1664525 + 1013904223) >>> 0; return seed / 4294967296; }
+
+  ctx.fillStyle = "#fff";
+  ctx.fillRect(0, 0, size, size);
+  ctx.fillStyle = "#111";
+
+  // Draw position detection squares (corners)
+  function drawFinder(x, y){
+    ctx.fillStyle = "#111";
+    ctx.fillRect(x*cell, y*cell, 7*cell, 7*cell);
+    ctx.fillStyle = "#fff";
+    ctx.fillRect((x+1)*cell, (y+1)*cell, 5*cell, 5*cell);
+    ctx.fillStyle = "#111";
+    ctx.fillRect((x+2)*cell, (y+2)*cell, 3*cell, 3*cell);
+  }
+
+  // Draw random data modules (avoiding finder areas)
+  for(let r=0;r<cols;r++){
+    for(let c=0;c<cols;c++){
+      // Skip finder zones
+      if((r<8 && c<8)||(r<8 && c>cols-9)||(r>cols-9 && c<8)) continue;
+      if(rng() > 0.52){
+        ctx.fillStyle = "#111";
+        ctx.fillRect(c*cell, r*cell, cell-1, cell-1);
+      }
+    }
+  }
+
+  // Finder patterns
+  drawFinder(0, 0);
+  drawFinder(cols-7, 0);
+  drawFinder(0, cols-7);
+
+  // Timing lines
+  ctx.fillStyle = "#111";
+  for(let i=8;i<cols-8;i++){
+    if(i%2===0){
+      ctx.fillRect(i*cell, 6*cell, cell-1, cell-1);
+      ctx.fillRect(6*cell, i*cell, cell-1, cell-1);
+    }
+  }
+}
+
+/* ==========================================
+   TOP GAINERS / LOSERS — CoinGecko API
+========================================== */
+let allCoins = [];
+let glMode   = "gainers";
+
+async function fetchMarketData(){
+  const list = document.getElementById("glList");
+  try{
+    const url =
+      "https://api.coingecko.com/api/v3/coins/markets" +
+      "?vs_currency=usd&order=market_cap_desc&per_page=100&page=1" +
+      "&sparkline=false&price_change_percentage=24h";
+    const res  = await fetch(url);
+    const data = await res.json();
+    if(!Array.isArray(data) || data.length === 0) throw new Error("No data");
+    allCoins = data;
+    renderGL();
+  } catch(err){
+    list.innerHTML =
+      '<div class="gl-error">⚠️ Could not load market data.<br>' +
+      '<small>CoinGecko free tier may be rate-limited. Try again shortly.</small></div>';
+  }
+}
+
+function renderGL(){
+  const list = document.getElementById("glList");
+  if(!allCoins.length){ list.innerHTML='<div class="gl-loading">Loading…</div>'; return; }
+  const sorted = [...allCoins].sort((a,b)=>{
+    const aC = a.price_change_percentage_24h || 0;
+    const bC = b.price_change_percentage_24h || 0;
+    return glMode === "gainers" ? bC - aC : aC - bC;
+  });
+  const top5 = sorted.slice(0,5);
+  list.innerHTML = top5.map(coin => {
+    const chg  = coin.price_change_percentage_24h || 0;
+    const isUp = chg >= 0;
+    const sign = isUp ? "+" : "";
+    const cls  = isUp ? "up" : "down";
+    const price = coin.current_price >= 1
+      ? "$" + coin.current_price.toLocaleString("en-US",{maximumFractionDigits:2})
+      : "$" + coin.current_price.toFixed(6);
+    return `
+    <div class="gl-row">
+      <img class="gl-icon" src="${coin.image}" alt="${coin.symbol}"
+        onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+      <div class="gl-icon-placeholder" style="display:none;">
+        ${coin.symbol.toUpperCase().slice(0,2)}
+      </div>
+      <div class="gl-info">
+        <div class="gl-name">${coin.name}</div>
+        <div class="gl-price">${price}</div>
+      </div>
+      <div class="gl-change ${cls}">${sign}${chg.toFixed(2)}%</div>
+    </div>`;
+  }).join("");
+}
+
+function switchGL(btn, mode){
+  document.querySelectorAll(".gl-tab").forEach(b => b.classList.remove("active"));
+  btn.classList.add("active");
+  glMode = mode;
+  renderGL();
+}
+
+fetchMarketData();
+setInterval(fetchMarketData, 60000);
+
+</script>
+</body>
+</html>
